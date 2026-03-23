@@ -1,0 +1,42 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+    color-scheme: light;
+}
+
+body {
+    @apply bg-felt-50 text-felt-900 font-body;
+    background-image: radial-gradient(circle at top left, rgba(196, 161, 123, 0.15), transparent 45%),
+        radial-gradient(circle at 30% 20%, rgba(116, 126, 142, 0.08), transparent 40%);
+}
+
+::selection {
+    background: #c0a07b;
+    color: #3e2a1f;
+}
+
+.container-base {
+    @apply mx-auto w-full max-w-6xl px-6;
+}
+
+.pattern-card {
+    background-image: radial-gradient(circle at top left, rgba(255, 255, 255, 0.7), rgba(0, 0, 0, 0.02)),
+        linear-gradient(120deg, rgba(231, 218, 201, 0.6), rgba(250, 246, 242, 0.95));
+}
+
+.ornament-surface {
+    position: relative;
+    overflow: hidden;
+}
+
+.ornament-surface::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg width='220' height='220' viewBox='0 0 220 220' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' stroke='%23c0a07b' stroke-width='2' opacity='0.25'%3E%3Cpath d='M110 20c30 0 55 25 55 55s-25 55-55 55-55-25-55-55 25-55 55-55Z'/%3E%3Cpath d='M110 45c16 0 30 14 30 30s-14 30-30 30-30-14-30-30 14-30 30-30Z'/%3E%3Cpath d='M110 95c8 0 15 7 15 15s-7 15-15 15-15-7-15-15 7-15 15-15Z'/%3E%3Cpath d='M40 110c0-38 32-70 70-70'/%3E%3Cpath d='M180 110c0 38-32 70-70 70'/%3E%3C/g%3E%3C/svg%3E");
+    background-size: 220px 220px;
+    opacity: 0.2;
+    pointer-events: none;
+}
