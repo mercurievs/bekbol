@@ -1,88 +1,212 @@
 # Bekbol
 
-Проект состоит из двух частей:
+Сервис состоит из двух частей:
 
 - backend: FastAPI + SQLAlchemy + Alembic
 - frontend: Next.js 14 (App Router)
 
-## Быстрый запуск (Windows)
+Ниже инструкция для Windows, чтобы запускать проект самостоятельно без дополнительных подсказок.
 
-1. Клонируйте проект:
+## 1. Что должно быть установлено
 
-   git clone <https://github.com/mercurievs/bekbol.git>
-   cd bekbol
+1. Git
+2. Node.js 20 LTS (рекомендуется)
+3. Python 3.12 или 3.13 (рекомендуется)
 
-2. Запустите backend (в первом терминале):
+Важно: Python 3.14 для этого проекта может не подойти из-за сборки pydantic-core.
 
-   cd backend
-   python -m venv .venv
-   .\.venv\Scripts\activate
-   pip install -r requirements.txt
+Проверка версий:
 
-   Создайте файл .env в папке backend со значениями:
+```powershell
+git --version
+node -v
+py -0p
+```
 
-   database_url=sqlite:///./bekbol.db
-   jwt_secret=change_me
-   api_host=0.0.0.0
-   api_port=8000
+## 2. Клонирование проекта
 
-   Примените миграции и стартуйте API:
+```powershell
+git clone https://github.com/mercurievs/bekbol.git
+cd bekbol
+```
 
-   alembic upgrade head
-   uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
+## 3. Настройка backend
 
-3. Запустите frontend (во втором терминале):
+Откройте первый терминал в корне проекта.
 
-   cd frontend
-   npm install
+1. Перейдите в папку backend
 
-   Создайте файл .env.local в папке frontend:
+```powershell
+cd backend
+```
 
-   BACKEND_URL=<http://127.0.0.1:8000>
+2. Создайте и активируйте виртуальное окружение
 
-   Запустите фронтенд:
+Если установлен Python 3.12:
 
-   npm run dev
+```powershell
+py -3.12 -m venv ..\.venv
+..\.venv\Scripts\Activate.ps1
+```
 
-4. Откройте в браузере:
+Если установлен Python 3.13:
 
-- frontend: <http://localhost:3000>
-- backend health-check: <http://127.0.0.1:8000/health>
-- backend docs (Swagger): <http://127.0.0.1:8000/docs>
+```powershell
+py -3.13 -m venv ..\.venv
+..\.venv\Scripts\Activate.ps1
+```
 
-## Полезные команды
+3. Установите зависимости
+
+```powershell
+python -m pip install --upgrade pip
+python -m pip install -r requirements.txt
+```
+
+4. Создайте файл backend/.env
+
+Содержимое:
+
+```env
+database_url=sqlite:///./bekbol.db
+jwt_secret=change_me
+api_host=0.0.0.0
+api_port=8000
+```
+
+5. Примените миграции и запустите backend
+
+```powershell
+python -m alembic upgrade head
+python -m uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
+```
+
+Backend должен быть доступен по адресу:
+
+- http://127.0.0.1:8000/health
+- http://127.0.0.1:8000/docs
+
+## 4. Настройка frontend
+
+Откройте второй терминал в корне проекта.
+
+1. Перейдите в папку frontend
+
+```powershell
+cd frontend
+```
+
+2. Установите зависимости
+
+```powershell
+npm install
+```
+
+3. Создайте файл frontend/.env.local
+
+Содержимое:
+
+```env
+BACKEND_URL=http://127.0.0.1:8000
+```
+
+4. Запустите frontend
+
+```powershell
+npm run dev
+```
+
+Frontend будет доступен по адресу:
+
+- http://localhost:3000
+
+## 5. Ежедневный запуск после первой настройки
+
+После того как вы один раз выполнили установку зависимостей, каждый следующий запуск обычно такой:
+
+Терминал 1 (backend):
+
+```powershell
+cd backend
+..\.venv\Scripts\Activate.ps1
+python -m alembic upgrade head
+python -m uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
+```
+
+Терминал 2 (frontend):
+
+```powershell
+cd frontend
+npm run dev
+```
+
+## 6. Быстрая проверка, что все работает
+
+Откройте в браузере:
+
+1. http://localhost:3000
+2. http://127.0.0.1:8000/health
+3. http://127.0.0.1:8000/docs
+
+Если все страницы открываются, проект запущен корректно.
+
+## 7. Частые проблемы и решение
+
+### Ошибка ERR_CONNECTION_REFUSED на localhost:3000
+
+Причина: frontend не запущен.
+
+Решение:
+
+```powershell
+cd frontend
+npm install
+npm run dev
+```
+
+### Backend не запускается из-за pydantic-core / PyO3 / Rust ошибок
+
+Причина: используется Python 3.14.
+
+Решение: установить Python 3.12 или 3.13, пересоздать окружение и заново установить зависимости.
+
+```powershell
+cd backend
+deactivate
+Remove-Item -Recurse -Force ..\.venv
+py -3.12 -m venv ..\.venv
+..\.venv\Scripts\Activate.ps1
+python -m pip install --upgrade pip
+python -m pip install -r requirements.txt
+```
+
+### Frontend не может обратиться к backend
+
+Проверьте:
+
+1. Backend действительно запущен на порту 8000
+2. В файле frontend/.env.local указано:
+
+```env
+BACKEND_URL=http://127.0.0.1:8000
+```
+
+3. После изменения .env.local перезапущен npm run dev
+
+## 8. Полезные команды
 
 Backend:
 
-- запуск без reload: uvicorn app.main:app --host 0.0.0.0 --port 8000
-- новая миграция: alembic revision --autogenerate -m "описание"
-- применить миграции: alembic upgrade head
+```powershell
+python -m uvicorn app.main:app --host 0.0.0.0 --port 8000
+python -m alembic revision --autogenerate -m "описание"
+python -m alembic upgrade head
+```
 
 Frontend:
 
-- dev: npm run dev
-- build: npm run build
-- prod-start: npm run start
-
-## Частые проблемы
-
-1. Ошибка CORS
-
-- Проверьте, что frontend открыт на <http://localhost:3000>
-- При необходимости добавьте origin в backend app/core/config.py
-
-1. Ошибка подключения frontend к backend
-
-- Проверьте BACKEND_URL в frontend/.env.local
-- Проверьте, что backend запущен на порту 8000
-
-1. Ошибки миграций
-
-- Выполняйте команды alembic из папки backend
-- Убедитесь, что файл backend/.env существует и содержит корректный database_url
-
-## Структура
-
-- backend/: API, модели, схемы, миграции
-- frontend/: UI на Next.js
-- .github/: инструкции Copilot
+```powershell
+npm run dev
+npm run build
+npm run start
+```
